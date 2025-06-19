@@ -8,10 +8,6 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-// Inisialisasi data global jika belum ada
-if (!localStorage.getItem("transactions_all")) {
-  localStorage.setItem("transactions_all", "[]");
-}
     const isLoggedIn = localStorage.getItem("loggedIn");
     const userData = localStorage.getItem("user");
 
@@ -67,13 +63,12 @@ if (!localStorage.getItem("transactions_all")) {
     }
 
     function getTransactions() {
-  const all = JSON.parse(localStorage.getItem("transactions_all") || "[]");
-  return all;
-}
+      return JSON.parse(localStorage.getItem("transactions") || "[]");
+    }
 
     function saveTransactions(data) {
-  localStorage.setItem("transactions_all", JSON.stringify(data));
-}
+      localStorage.setItem("transactions", JSON.stringify(data));
+    }
 
     const tbody = document.querySelector("#transaction-table tbody");
     const totalTabungan = document.getElementById("total-tabungan");
@@ -113,7 +108,7 @@ if (!localStorage.getItem("transactions_all")) {
     updateDashboard();
     // Sinkronisasi real-time antar akun/browser/tab
     window.addEventListener("storage", (event) => {
-      if (event.key === "transactions_all") {
+      if (event.key === "transactions") {
         updateDashboard();
       }
     });
@@ -146,7 +141,7 @@ if (!localStorage.getItem("transactions_all")) {
       updateDashboard();
     // Sinkronisasi real-time antar akun/browser/tab
     window.addEventListener("storage", (event) => {
-      if (event.key === "transactions_all") {
+      if (event.key === "transactions") {
         updateDashboard();
       }
     });
@@ -208,7 +203,7 @@ if (!localStorage.getItem("transactions_all")) {
       updateDashboard();
     // Sinkronisasi real-time antar akun/browser/tab
     window.addEventListener("storage", (event) => {
-      if (event.key === "transactions_all") {
+      if (event.key === "transactions") {
         updateDashboard();
       }
     });
@@ -224,7 +219,7 @@ if (!localStorage.getItem("transactions_all")) {
       updateDashboard();
     // Sinkronisasi real-time antar akun/browser/tab
     window.addEventListener("storage", (event) => {
-      if (event.key === "transactions_all") {
+      if (event.key === "transactions") {
         updateDashboard();
       }
     });
@@ -453,10 +448,6 @@ function togglePasswordVisibility() {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-// Inisialisasi data global jika belum ada
-if (!localStorage.getItem("transactions_all")) {
-  localStorage.setItem("transactions_all", "[]");
-}
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const avatarEl = document.getElementById("user-avatar-header");
   const nameEl = document.getElementById("user-name-header");
