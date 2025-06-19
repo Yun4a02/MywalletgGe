@@ -7,6 +7,40 @@
 <link rel="stylesheet" href="home.css" />
 
   <script>
+db.ref('transactions').on('value', (snapshot) => {
+    const data = snapshot.val() || {};
+    const transaksiArray = Object.values(data);
+
+    // Tampilkan di dashboard
+    updateDashboard(transaksiArray);
+  });
+
+  function updateDashboard(dataArray) {
+    const tbody = document.querySelector("#transaction-table tbody");
+    tbody.innerHTML = "";
+    let totalMasuk = 0, totalKeluar = 0;
+
+    dataArray.forEach((t, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${t.tanggal}</td>
+        <td>${t.keterangan}</td>
+        <td class="${t.jenis === 'Pemasukan' ? 'masuk' : 'keluar'}">${t.jenis}</td>
+        <td>Rp ${t.jumlah.toLocaleString('id-ID')}</td>
+        <td>${t.user || '-'}</td>
+        <td>-</td>
+      `;
+      tbody.appendChild(row);
+
+      if (t.jenis === "Pemasukan") totalMasuk += t.jumlah;
+      else if (t.jenis === "Pengeluaran") totalKeluar += t.jumlah;
+    });
+
+    document.getElementById("total-tabungan").textContent = "Rp " + (totalMasuk - totalKeluar).toLocaleString('id-ID');
+    document.getElementById("total-masuk").textContent = "Rp " + totalMasuk.toLocaleString('id-ID');
+    document.getElementById("total-keluar").textContent = "Rp " + totalKeluar.toLocaleString('id-ID');
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const isLoggedIn = localStorage.getItem("loggedIn");
     const userData = localStorage.getItem("user");
