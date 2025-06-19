@@ -4,272 +4,209 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Tabungan</title>
-<link rel="stylesheet" href="home.css" />
-
+  <link rel="stylesheet" href="home.css"/>
+  
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const isLoggedIn = localStorage.getItem("loggedIn");
-    const userData = localStorage.getItem("user");
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLoggedIn = localStorage.getItem("loggedIn");
+      const userData = localStorage.getItem("user");
+      const storedTransactions = JSON.parse(localStorage.getItem("transactions") || "[]");
 
-    if (isLoggedIn !== "true" || !userData) {
-      alert("Silakan login terlebih dahulu.");
-      window.location.href = "login.html";
-      return;
-    }
+      const themeCheckbox = document.getElementById("darkModeToggle");
+      const modeIcon = document.getElementById("modeIcon");
 
-    let user;
-    try {
-      user = JSON.parse(userData);
-      document.getElementById("username").textContent = user.name || "User";
-    } catch (e) {
-      alert("Data pengguna rusak. Silakan login ulang.");
-      localStorage.removeItem("loggedIn");
-      window.location.href = "login.html";
-      return;
-    }
+      function updateIcon(theme) {
+        if (modeIcon) {
+          modeIcon.textContent = theme === "dark" ? "⏾" : "☀︎";
+        }
+      }
 
-    // Tema
-    const themeCheckbox = document.getElementById("darkModeToggle");
-    const modeIcon = document.getElementById("modeIcon");
-    const savedTheme = localStorage.getItem("theme");
-
-    function updateIcon(theme) {
-      if (modeIcon) modeIcon.textContent = theme === "dark" ? "⏾" : "☀︎";
-    }
-
-    if (savedTheme === "dark") {
-      document.body.classList.add("dark-mode");
-      themeCheckbox.checked = true;
-      updateIcon("dark");
-    } else {
-      updateIcon("light");
-    }
-
-    themeCheckbox.addEventListener("change", () => {
-      if (themeCheckbox.checked) {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
         document.body.classList.add("dark-mode");
-        localStorage.setItem("theme", "dark");
+        if (themeCheckbox) themeCheckbox.checked = true;
         updateIcon("dark");
       } else {
-        document.body.classList.remove("dark-mode");
-        localStorage.setItem("theme", "light");
         updateIcon("light");
       }
-    });
 
-    // Helper
-    function formatRupiah(amount) {
-      return 'Rp ' + amount.toLocaleString('id-ID');
-    }
+      if (themeCheckbox) {
+        themeCheckbox.addEventListener("change", () => {
+          if (themeCheckbox.checked) {
+            document.body.classList.add("dark-mode");
+            localStorage.setItem("theme", "dark");
+            updateIcon("dark");
+          } else {
+            document.body.classList.remove("dark-mode");
+            localStorage.setItem("theme", "light");
+            updateIcon("light");
+          }
+        });
+      }
 
-    function getTransactions() {
-      return JSON.parse(localStorage.getItem("transactions") || "[]");
-    }
+      if (isLoggedIn !== "true" || !userData) {
+        alert("Silakan login terlebih dahulu.");
+        window.location.href = "login.html";
+        return;
+      }
 
-    function saveTransactions(data) {
-      localStorage.setItem("transactions", JSON.stringify(data));
-    }
+      let user;
+      try {
+        user = JSON.parse(userData);
+        document.getElementById("username").textContent = user.name || "User";
+      } catch (e) {
+        alert("Data pengguna rusak. Silakan login kembali.");
+        localStorage.removeItem("loggedIn");
+        window.location.href = "login.html";
+        return;
+      }
 
-    const tbody = document.querySelector("#transaction-table tbody");
-    const totalTabungan = document.getElementById("total-tabungan");
-    const totalMasukEl = document.getElementById("total-masuk");
-    const totalKeluarEl = document.getElementById("total-keluar");
+      function formatRupiah(amount) {
+        return 'Rp ' + amount.toLocaleString('id-ID');
+      }
 
-    function updateDashboard() {
-      const all = getTransactions();
-      tbody.innerHTML = "";
-      let totalMasuk = 0;
-      let totalKeluar = 0;
+      const tbody = document.querySelector("#transaction-table tbody");
+      const totalTabungan = document.getElementById("total-tabungan");
+      const totalMasukEl = document.getElementById("total-masuk");
+      const totalKeluarEl = document.getElementById("total-keluar");
 
-      all.forEach((t, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${t.tanggal}</td>
-          <td>${t.keterangan}</td>
-          <td class="${t.jenis === 'Pemasukan' ? 'masuk' : 'keluar'}">${t.jenis}</td>
-          <td>${formatRupiah(t.jumlah)}</td>
-          <td>${t.user || "-"}</td>
-          <td class="action-btn-container">
-            <button class="action-btn edit-btn" onclick="editTransaction(${index})">Edit</button>
-            <button class="action-btn delete-btn" onclick="deleteTransaction(${index})">Hapus</button>
-          </td>
-        `;
-        tbody.appendChild(row);
+      function updateDashboard() {
+        tbody.innerHTML = "";
 
-        if (t.jenis === "Pemasukan") totalMasuk += t.jumlah;
-        if (t.jenis === "Pengeluaran") totalKeluar += t.jumlah;
+        let totalMasuk = 0;
+        let totalKeluar = 0;
+
+        storedTransactions.forEach((t, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${t.tanggal}</td>
+            <td>${t.keterangan}</td>
+            <td class="${t.jenis === 'Pemasukan' ? 'masuk' : 'keluar'}">${t.jenis}</td>
+            <td>${formatRupiah(t.jumlah)}</td>
+            <td>${t.user || "-"}</td>
+            <td class="action-btn-container">
+              <button class="action-btn edit-btn" onclick="editTransaction(${index})">Edit</button>
+              <button class="action-btn delete-btn" onclick="deleteTransaction(${index})">Hapus</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+
+          if (t.jenis === "Pemasukan") totalMasuk += t.jumlah;
+          if (t.jenis === "Pengeluaran") totalKeluar += t.jumlah;
+        });
+
+        totalTabungan.textContent = formatRupiah(totalMasuk - totalKeluar);
+        totalMasukEl.textContent = formatRupiah(totalMasuk);
+        totalKeluarEl.textContent = formatRupiah(totalKeluar);
+      }
+
+      updateDashboard();
+
+      // Format input jumlah saat input
+      const jumlahInput = document.getElementById("jumlah");
+      jumlahInput.addEventListener("input", function () {
+        let value = this.value.replace(/\D/g, "");
+        this.value = new Intl.NumberFormat("id-ID").format(value);
       });
 
-      totalTabungan.textContent = formatRupiah(totalMasuk - totalKeluar);
-      totalMasukEl.textContent = formatRupiah(totalMasuk);
-      totalKeluarEl.textContent = formatRupiah(totalKeluar);
+      // Tambah transaksi baru (dengan user)
+      document.getElementById("add-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const tanggal = document.getElementById("tanggal").value;
+        const keterangan = document.getElementById("keterangan").value;
+        const jenis = document.getElementById("jenis").value;
+        const jumlahStr = document.getElementById("jumlah").value;
+        const jumlah = parseInt(jumlahStr.replace(/\./g, ""));
+
+        if (isNaN(jumlah) || jumlah <= 0) {
+          alert("Masukkan jumlah yang valid.");
+          return;
+        }
+
+        storedTransactions.push({ tanggal, keterangan, jenis, jumlah, user: user.name || "User" });
+        localStorage.setItem("transactions", JSON.stringify(storedTransactions));
+        updateDashboard();
+        e.target.reset();
+      });
+
+      // Modal edit transaction
+      const modal = document.getElementById("editModal");
+      const modalForm = document.getElementById("edit-form");
+      const modalTanggal = document.getElementById("edit-tanggal");
+      const modalKeterangan = document.getElementById("edit-keterangan");
+      const modalJenis = document.getElementById("edit-jenis");
+      const modalJumlah = document.getElementById("edit-jumlah");
+      const modalUser = document.getElementById("edit-user");
+      let editIndex = null;
+
+      window.editTransaction = (index) => {
+        editIndex = index;
+        const t = storedTransactions[index];
+        modalTanggal.value = t.tanggal;
+        modalKeterangan.value = t.keterangan;
+        modalJenis.value = t.jenis;
+        modalJumlah.value = new Intl.NumberFormat("id-ID").format(t.jumlah);
+        modalUser.textContent = t.user || "-";
+
+        modal.classList.add("active");
+      };
+
+      document.getElementById("modal-close").addEventListener("click", () => {
+        modal.classList.remove("active");
+      });
+
+      modalJumlah.addEventListener("input", function () {
+        let value = this.value.replace(/\D/g, "");
+        this.value = new Intl.NumberFormat("id-ID").format(value);
+      });
+
+      modalForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (editIndex === null) return;
+
+        const tanggal = modalTanggal.value;
+        const keterangan = modalKeterangan.value;
+        const jenis = modalJenis.value;
+        const jumlahStr = modalJumlah.value;
+        const jumlah = parseInt(jumlahStr.replace(/\./g, ""));
+
+        if (isNaN(jumlah) || jumlah <= 0) {
+          alert("Masukkan jumlah yang valid.");
+          return;
+        }
+
+        storedTransactions[editIndex] = { 
+          tanggal, 
+          keterangan, 
+          jenis, 
+          jumlah, 
+          user: user.name || "User" // update user yg edit
+        };
+        localStorage.setItem("transactions", JSON.stringify(storedTransactions));
+        updateDashboard();
+        modal.classList.remove("active");
+      });
+
+      window.deleteTransaction = (index) => {
+        if (confirm("Yakin ingin menghapus transaksi ini?")) {
+          storedTransactions.splice(index, 1);
+          localStorage.setItem("transactions", JSON.stringify(storedTransactions));
+          updateDashboard();
+        }
+      };
+
+    });
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
     }
-
-    updateDashboard();
-    // Sinkronisasi real-time antar akun/browser/tab
-    window.addEventListener("storage", (event) => {
-      if (event.key === "transactions") {
-        updateDashboard();
-      }
-    });
-
-
-    // Input jumlah
-    const jumlahInput = document.getElementById("jumlah");
-    jumlahInput.addEventListener("input", function () {
-      let value = this.value.replace(/\D/g, "");
-      this.value = new Intl.NumberFormat("id-ID").format(value);
-    });
-
-    // Tambah transaksi
-    document.getElementById("add-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const tanggal = document.getElementById("tanggal").value;
-      const keterangan = document.getElementById("keterangan").value;
-      const jenis = document.getElementById("jenis").value;
-      const jumlahStr = document.getElementById("jumlah").value;
-      const jumlah = parseInt(jumlahStr.replace(/\./g, ""));
-
-      if (!tanggal || !keterangan || isNaN(jumlah) || jumlah <= 0) {
-        alert("Lengkapi data dengan benar.");
-        return;
-      }
-
-      const all = getTransactions();
-      all.push({ tanggal, keterangan, jenis, jumlah, user: user.name || "User" });
-      saveTransactions(all);
-      updateDashboard();
-    // Sinkronisasi real-time antar akun/browser/tab
-    window.addEventListener("storage", (event) => {
-      if (event.key === "transactions") {
-        updateDashboard();
-      }
-    });
-
-      e.target.reset();
-    });
-
-    // Modal edit
-    const modal = document.getElementById("editModal");
-    const modalForm = document.getElementById("edit-form");
-    const modalTanggal = document.getElementById("edit-tanggal");
-    const modalKeterangan = document.getElementById("edit-keterangan");
-    const modalJenis = document.getElementById("edit-jenis");
-    const modalJumlah = document.getElementById("edit-jumlah");
-    const modalUser = document.getElementById("edit-user");
-    let editIndex = null;
-
-    window.editTransaction = (index) => {
-      const all = getTransactions();
-      const t = all[index];
-      editIndex = index;
-
-      modalTanggal.value = t.tanggal;
-      modalKeterangan.value = t.keterangan;
-      modalJenis.value = t.jenis;
-      modalJumlah.value = new Intl.NumberFormat("id-ID").format(t.jumlah);
-      modalUser.textContent = t.user || "-";
-
-      modal.classList.add("active");
-    };
-
-    document.getElementById("modal-close").addEventListener("click", () => {
-      modal.classList.remove("active");
-    });
-
-    modalJumlah.addEventListener("input", function () {
-      let value = this.value.replace(/\D/g, "");
-      this.value = new Intl.NumberFormat("id-ID").format(value);
-    });
-
-    modalForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (editIndex === null) return;
-
-      const tanggal = modalTanggal.value;
-      const keterangan = modalKeterangan.value;
-      const jenis = modalJenis.value;
-      const jumlahStr = modalJumlah.value;
-      const jumlah = parseInt(jumlahStr.replace(/\./g, ""));
-
-      if (!tanggal || !keterangan || isNaN(jumlah) || jumlah <= 0) {
-        alert("Data tidak valid.");
-        return;
-      }
-
-      const all = getTransactions();
-      all[editIndex] = { tanggal, keterangan, jenis, jumlah, user: user.name || "User" };
-      saveTransactions(all);
-      updateDashboard();
-    // Sinkronisasi real-time antar akun/browser/tab
-    window.addEventListener("storage", (event) => {
-      if (event.key === "transactions") {
-        updateDashboard();
-      }
-    });
-
-      modal.classList.remove("active");
-    });
-
-    window.deleteTransaction = (index) => {
-      if (!confirm("Yakin ingin menghapus transaksi ini?")) return;
-      const all = getTransactions();
-      all.splice(index, 1);
-      saveTransactions(all);
-      updateDashboard();
-    // Sinkronisasi real-time antar akun/browser/tab
-    window.addEventListener("storage", (event) => {
-      if (event.key === "transactions") {
-        updateDashboard();
-      }
-    });
-
-    };
-  });
-
-  function logout() {
-    localStorage.removeItem("loggedIn");
-    window.location.href = "login.html";
-  }
-
-function togglePasswordVisibility() {
-  const input = document.getElementById("profile-password");
-  input.type = input.type === "password" ? "text" : "password";
-}
-
-</script>
-
-<style>
-  .user-info img {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  #profile-picture-preview {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #aaa;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
-  }
-</style>
-
+  </script>
 </head>
 <body>
   <div class="dashboard">
     <header>
-      
-<div class="user-info" style="display: flex; align-items: center; gap: 10px;">
-  <img id="user-avatar-header" onclick="openProfileModal()" style="cursor: pointer;" src="profile-default-avatar.png" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
-  <span id="user-name-header" class="profile-name" style="font-weight: bold; color: #fff;"></span>
-</div>
-
-      <h1 style="margin-top: 20px;">Selamat Datang, <span id="username"></span> 👋</h1>
+      <h1>Selamat Datang, <span id="username"></span> 👋</h1>
       <div class="theme-toggle">
         <label for="darkModeToggle" id="modeIcon">☀︎</label>
         <input type="checkbox" id="darkModeToggle" />
@@ -336,7 +273,7 @@ function togglePasswordVisibility() {
 
     <!-- Modal Edit -->
     <div class="modal" id="editModal">
-      <div class="modal-content" style="margin-top: -40px;">
+      <div class="modal-content">
         <h3>Edit Transaksi</h3>
         <form id="edit-form">
           <label for="edit-tanggal">Tanggal</label>
@@ -366,101 +303,8 @@ function togglePasswordVisibility() {
     </div>
 
     <footer>
-      <p>© Copyright 2025 Wukong. All Rights Reserved. | Tabungan App</p>
+      <p>© 2025 My Wallet | Tabungan App</p>
     </footer>
   </div>
-
-<!-- Modal Profil -->
-<div class="modal" id="profileModal">
-  <div class="modal-content" style="margin-top: -40px;">
-    <h3>Profil Pengguna</h3>
-    <form id="profile-form">
-      <div style="text-align: center; margin-bottom: 1rem;">
-        <img id="profile-picture-preview" src="default-avatar.png" alt="Foto Profil" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
-        <br />
-        <input type="file" id="profile-picture" accept="image/*" style="margin-top: 0.5rem;" />
-      </div>
-      <label for="profile-name">Nama</label>
-      <input type="text" id="profile-name" required />
-      <label for="profile-email">Email</label>
-      <input type="email" id="profile-email" required />
-      <label for="profile-password">Password</label>
-<div style="position: relative;">
-  <input type="password" id="profile-password" required style="padding-right: 30px;" />
-  <span onclick="togglePasswordVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">👁️</span>
-</div>
-
-      <div class="modal-actions">
-        <button type="button" class="cancel-btn" onclick="closeProfileModal()">Batal</button>
-        <button type="submit" class="save-btn">Simpan</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-function openProfileModal() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (user) {
-    document.getElementById("profile-name").value = user.name || "";
-    document.getElementById("profile-email").value = user.email || "";
-    document.getElementById("profile-password").value = user.password || "";
-    document.getElementById("profile-picture-preview").src = user.avatar || "default-avatar.png";
-  }
-  document.getElementById("profileModal").classList.add("active");
-}
-
-function closeProfileModal() {
-  document.getElementById("profileModal").classList.remove("active");
-}
-
-document.getElementById("profile-picture").addEventListener("change", function () {
-  const file = this.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      document.getElementById("profile-picture-preview").src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-document.getElementById("profile-form").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const name = document.getElementById("profile-name").value;
-  const email = document.getElementById("profile-email").value;
-  const password = document.getElementById("profile-password").value;
-  const avatar = document.getElementById("profile-picture-preview").src;
-
-  const updatedUser = { name, email, password, avatar };
-  localStorage.setItem("user", JSON.stringify(updatedUser));
-  alert("Profil berhasil diperbarui!");
-  document.getElementById("username").textContent = name;
-  closeProfileModal();
-});
-
-function togglePasswordVisibility() {
-  const input = document.getElementById("profile-password");
-  input.type = input.type === "password" ? "text" : "password";
-}
-
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const avatarEl = document.getElementById("user-avatar-header");
-  const nameEl = document.getElementById("user-name-header");
-
-  if (avatarEl) avatarEl.src = user.avatar || "profile-default-avatar.png";
-  if (nameEl) nameEl.textContent = user.name || "User";
-});
-
-function togglePasswordVisibility() {
-  const input = document.getElementById("profile-password");
-  input.type = input.type === "password" ? "text" : "password";
-}
-
-</script>
 </body>
 </html>
