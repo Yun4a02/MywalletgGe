@@ -5,102 +5,81 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Tabungan</title>
-  <link rel="stylesheet" href="home.css"/>
-</head>
-<body>
-  <div class="dashboard">
-    <header>
-      <h1 id="username">Selamat Datang, User 👋</h1>
-      <div class="theme-toggle">
-        <div class="user-info">
-          <img id="user-avatar-header" src="profile-default-avatar.png" alt="Foto" width="48" height="48">
-          <span id="user-name-header" class="profile-name">User</span>
-        </div>
-        <label for="darkModeToggle" id="modeIcon">☀︎</label>
-        <input type="checkbox" id="darkModeToggle" />
-        <button class="logout-btn" onclick="logout()">Logout</button>
-      </div>
-    </header>
-
-    <section class="summary">
-      <div class="card"><h2>Total Tabungan</h2><p id="total-tabungan">Rp 0</p></div>
-      <div class="card"><h2>Pemasukan</h2><p id="total-masuk">Rp 0</p></div>
-      <div class="card"><h2>Pengeluaran</h2><p id="total-keluar">Rp 0</p></div>
-    </section>
-
-    <section class="transaction-add">
-      <h2>Tambah Transaksi</h2>
-      <form id="add-form">
-        <input type="date" id="tanggal" required />
-        <input type="text" id="keterangan" placeholder="Keterangan" required />
-        <select id="jenis" required>
-          <option value="Pemasukan">Pemasukan</option>
-          <option value="Pengeluaran">Pengeluaran</option>
-        </select>
-        <input type="text" id="jumlah" placeholder="Jumlah" required />
-        <button type="submit"><span>Tambah</span></button>
-      </form>
-    </section>
-
-    <section class="transaction">
-      <h2>Riwayat Transaksi</h2>
-      <table id="transaction-table">
-        <thead>
-          <tr>
-            <th>Tanggal</th><th>Keterangan</th><th>Jenis</th><th>Jumlah</th><th>User</th><th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <footer><p>© 2025 My Wallet | Tabungan App</p></footer>
-  </div>
-
+  <link rel="stylesheet" href="home.css" />
   <script>
-    let user = JSON.parse(localStorage.getItem("user") || "{}");
-    const storedTransactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  document.addEventListener("DOMContentLoaded", () => {
+    const isLoggedIn = localStorage.getItem("loggedIn");
+    const userData = localStorage.getItem("user");
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const isLoggedIn = localStorage.getItem("loggedIn");
-      if (isLoggedIn !== "true" || !user) {
-        window.location.href = "login.html";
-        return;
+    if (isLoggedIn !== "true" || !userData) {
+      alert("Silakan login terlebih dahulu.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    let user;
+    try {
+      user = JSON.parse(userData);
+      document.getElementById("username").textContent = user.name || "User";
+    } catch (e) {
+      alert("Data pengguna rusak. Silakan login ulang.");
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+      return;
+    }
+
+    const themeCheckbox = document.getElementById("darkModeToggle");
+    const modeIcon = document.getElementById("modeIcon");
+    const savedTheme = localStorage.getItem("theme");
+
+    function updateIcon(theme) {
+      if (modeIcon) modeIcon.textContent = theme === "dark" ? "⏾" : "☀︎";
+    }
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark-mode");
+      themeCheckbox.checked = true;
+      updateIcon("dark");
+    } else {
+      updateIcon("light");
+    }
+
+    themeCheckbox.addEventListener("change", () => {
+      if (themeCheckbox.checked) {
+        document.body.classList.add("dark-mode");
+        localStorage.setItem("theme", "dark");
+        updateIcon("dark");
+      } else {
+        document.body.classList.remove("dark-mode");
+        localStorage.setItem("theme", "light");
+        updateIcon("light");
       }
-
-      document.getElementById("username").textContent = "Selamat Datang, " + (user.name || "User") + " 👋";
-      document.getElementById("user-name-header").textContent = user.name || "User";
-      document.getElementById("user-avatar-header").src = user.avatar || "profile-default-avatar.png";
-
-      document.getElementById("darkModeToggle").checked = localStorage.getItem("theme") === "dark";
-      toggleTheme();
-
-      document.getElementById("darkModeToggle").addEventListener("change", toggleTheme);
-      document.getElementById("add-form").addEventListener("submit", addTransaction);
-
-      document.getElementById("jumlah").addEventListener("input", e => {
-        e.target.value = new Intl.NumberFormat("id-ID").format(e.target.value.replace(/\D/g, ""));
-      });
-
-      updateDashboard();
     });
 
     function formatRupiah(amount) {
       return 'Rp ' + amount.toLocaleString('id-ID');
     }
 
+    function getTransactions() {
+      return JSON.parse(localStorage.getItem("transactions") || "[]");
+    }
+
+    function saveTransactions(data) {
+      localStorage.setItem("transactions", JSON.stringify(data));
+    }
+
+    const tbody = document.querySelector("#transaction-table tbody");
+    const totalTabungan = document.getElementById("total-tabungan");
+    const totalMasukEl = document.getElementById("total-masuk");
+    const totalKeluarEl = document.getElementById("total-keluar");
+
     function updateDashboard() {
-      const tbody = document.querySelector("#transaction-table tbody");
-      const totalTabungan = document.getElementById("total-tabungan");
-      const totalMasukEl = document.getElementById("total-masuk");
-      const totalKeluarEl = document.getElementById("total-keluar");
-
-      const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-
+      const all = getTransactions();
       tbody.innerHTML = "";
-      let totalMasuk = 0, totalKeluar = 0;
+      let totalMasuk = 0;
+      let totalKeluar = 0;
 
-      transactions.forEach((t, index) => {
+      all.forEach((t, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${t.tanggal}</td>
@@ -108,11 +87,15 @@
           <td class="${t.jenis === 'Pemasukan' ? 'masuk' : 'keluar'}">${t.jenis}</td>
           <td>${formatRupiah(t.jumlah)}</td>
           <td>${t.user || "-"}</td>
-          <td><button onclick="deleteTransaction(${index})">Hapus</button></td>`;
+          <td class="action-btn-container">
+            <button class="action-btn edit-btn" onclick="editTransaction(${index})">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteTransaction(${index})">Hapus</button>
+          </td>
+        `;
         tbody.appendChild(row);
 
         if (t.jenis === "Pemasukan") totalMasuk += t.jumlah;
-        else totalKeluar += t.jumlah;
+        if (t.jenis === "Pengeluaran") totalKeluar += t.jumlah;
       });
 
       totalTabungan.textContent = formatRupiah(totalMasuk - totalKeluar);
@@ -120,55 +103,121 @@
       totalKeluarEl.textContent = formatRupiah(totalKeluar);
     }
 
-    function addTransaction(e) {
+    updateDashboard();
+    syncUserProfile();
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === "transactions" || event.key === "user") {
+        updateDashboard();
+        syncUserProfile();
+      }
+    });
+
+    const jumlahInput = document.getElementById("jumlah");
+    jumlahInput.addEventListener("input", function () {
+      let value = this.value.replace(/\D/g, "");
+      this.value = new Intl.NumberFormat("id-ID").format(value);
+    });
+
+    document.getElementById("add-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const tanggal = document.getElementById("tanggal").value;
       const keterangan = document.getElementById("keterangan").value;
       const jenis = document.getElementById("jenis").value;
-      const jumlah = parseInt(document.getElementById("jumlah").value.replace(/\./g, ""));
+      const jumlahStr = document.getElementById("jumlah").value;
+      const jumlah = parseInt(jumlahStr.replace(/\./g, ""));
 
-      if (!jumlah || jumlah <= 0) return alert("Jumlah tidak valid");
+      if (!tanggal || !keterangan || isNaN(jumlah) || jumlah <= 0) {
+        alert("Lengkapi data dengan benar.");
+        return;
+      }
 
-      const newTx = { tanggal, keterangan, jenis, jumlah, user: user.name || "User" };
-      const allTx = JSON.parse(localStorage.getItem("transactions") || "[]");
-      allTx.push(newTx);
-      localStorage.setItem("transactions", JSON.stringify(allTx));
+      const all = getTransactions();
+      all.push({ tanggal, keterangan, jenis, jumlah, user: user.name || "User" });
+      saveTransactions(all);
       updateDashboard();
       e.target.reset();
-    }
+    });
 
-    function deleteTransaction(index) {
-      if (!confirm("Yakin hapus transaksi?")) return;
-      const allTx = JSON.parse(localStorage.getItem("transactions") || "[]");
-      allTx.splice(index, 1);
-      localStorage.setItem("transactions", JSON.stringify(allTx));
+    const modal = document.getElementById("editModal");
+    const modalForm = document.getElementById("edit-form");
+    const modalTanggal = document.getElementById("edit-tanggal");
+    const modalKeterangan = document.getElementById("edit-keterangan");
+    const modalJenis = document.getElementById("edit-jenis");
+    const modalJumlah = document.getElementById("edit-jumlah");
+    const modalUser = document.getElementById("edit-user");
+    let editIndex = null;
+
+    window.editTransaction = (index) => {
+      const all = getTransactions();
+      const t = all[index];
+      editIndex = index;
+
+      modalTanggal.value = t.tanggal;
+      modalKeterangan.value = t.keterangan;
+      modalJenis.value = t.jenis;
+      modalJumlah.value = new Intl.NumberFormat("id-ID").format(t.jumlah);
+      modalUser.textContent = t.user || "-";
+
+      modal.classList.add("active");
+    };
+
+    document.getElementById("modal-close").addEventListener("click", () => {
+      modal.classList.remove("active");
+    });
+
+    modalJumlah.addEventListener("input", function () {
+      let value = this.value.replace(/\D/g, "");
+      this.value = new Intl.NumberFormat("id-ID").format(value);
+    });
+
+    modalForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (editIndex === null) return;
+
+      const tanggal = modalTanggal.value;
+      const keterangan = modalKeterangan.value;
+      const jenis = modalJenis.value;
+      const jumlahStr = modalJumlah.value;
+      const jumlah = parseInt(jumlahStr.replace(/\./g, ""));
+
+      if (!tanggal || !keterangan || isNaN(jumlah) || jumlah <= 0) {
+        alert("Data tidak valid.");
+        return;
+      }
+
+      const all = getTransactions();
+      all[editIndex] = { tanggal, keterangan, jenis, jumlah, user: user.name || "User" };
+      saveTransactions(all);
       updateDashboard();
-    }
+      modal.classList.remove("active");
+    });
 
-    function logout() {
-      localStorage.removeItem("loggedIn");
-      window.location.href = "login.html";
-    }
-
-    function toggleTheme() {
-      const theme = document.getElementById("darkModeToggle").checked ? "dark" : "light";
-      document.body.classList.toggle("dark-mode", theme === "dark");
-      localStorage.setItem("theme", theme);
-      document.getElementById("modeIcon").textContent = theme === "dark" ? "⏾" : "☀︎";
-    }
+    window.deleteTransaction = (index) => {
+      if (!confirm("Yakin ingin menghapus transaksi ini?")) return;
+      const all = getTransactions();
+      all.splice(index, 1);
+      saveTransactions(all);
+      updateDashboard();
+    };
 
     function syncUserProfile() {
-      user = JSON.parse(localStorage.getItem("user") || "{}");
-      document.getElementById("user-name-header").textContent = user.name || "User";
-      document.getElementById("user-avatar-header").src = user.avatar || "profile-default-avatar.png";
-      document.getElementById("username").textContent = "Selamat Datang, " + (user.name || "User") + " 👋";
+      const updatedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      if (updatedUser) {
+        document.getElementById("username").textContent = updatedUser.name || "User";
+        document.getElementById("user-name-header").textContent = updatedUser.name || "User";
+        document.getElementById("user-avatar-header").src = updatedUser.avatar || "profile-default-avatar.png";
+      }
     }
+  });
 
-    // Listen to localStorage changes (from other tabs)
-    window.addEventListener("storage", function (event) {
-      if (event.key === "transactions") updateDashboard();
-      if (event.key === "user") syncUserProfile();
-    });
+  function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "login.html";
+  }
   </script>
+</head>
+<body>
+  <!-- Body content would go here -->
 </body>
 </html>
