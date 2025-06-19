@@ -1,11 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Tabungan</title>
-  <link rel="stylesheet" href="home.css" />
+<link rel="stylesheet" href="home.css" />
+
   <script>
   document.addEventListener("DOMContentLoaded", () => {
     const isLoggedIn = localStorage.getItem("loggedIn");
@@ -28,6 +28,7 @@
       return;
     }
 
+    // Tema
     const themeCheckbox = document.getElementById("darkModeToggle");
     const modeIcon = document.getElementById("modeIcon");
     const savedTheme = localStorage.getItem("theme");
@@ -56,6 +57,7 @@
       }
     });
 
+    // Helper
     function formatRupiah(amount) {
       return 'Rp ' + amount.toLocaleString('id-ID');
     }
@@ -104,21 +106,22 @@
     }
 
     updateDashboard();
-    syncUserProfile();
-
+    // Sinkronisasi real-time antar akun/browser/tab
     window.addEventListener("storage", (event) => {
-      if (event.key === "transactions" || event.key === "user") {
+      if (event.key === "transactions") {
         updateDashboard();
-        syncUserProfile();
       }
     });
 
+
+    // Input jumlah
     const jumlahInput = document.getElementById("jumlah");
     jumlahInput.addEventListener("input", function () {
       let value = this.value.replace(/\D/g, "");
       this.value = new Intl.NumberFormat("id-ID").format(value);
     });
 
+    // Tambah transaksi
     document.getElementById("add-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const tanggal = document.getElementById("tanggal").value;
@@ -136,9 +139,17 @@
       all.push({ tanggal, keterangan, jenis, jumlah, user: user.name || "User" });
       saveTransactions(all);
       updateDashboard();
+    // Sinkronisasi real-time antar akun/browser/tab
+    window.addEventListener("storage", (event) => {
+      if (event.key === "transactions") {
+        updateDashboard();
+      }
+    });
+
       e.target.reset();
     });
 
+    // Modal edit
     const modal = document.getElementById("editModal");
     const modalForm = document.getElementById("edit-form");
     const modalTanggal = document.getElementById("edit-tanggal");
@@ -190,6 +201,13 @@
       all[editIndex] = { tanggal, keterangan, jenis, jumlah, user: user.name || "User" };
       saveTransactions(all);
       updateDashboard();
+    // Sinkronisasi real-time antar akun/browser/tab
+    window.addEventListener("storage", (event) => {
+      if (event.key === "transactions") {
+        updateDashboard();
+      }
+    });
+
       modal.classList.remove("active");
     });
 
@@ -199,25 +217,250 @@
       all.splice(index, 1);
       saveTransactions(all);
       updateDashboard();
-    };
-
-    function syncUserProfile() {
-      const updatedUser = JSON.parse(localStorage.getItem("user") || "{}");
-      if (updatedUser) {
-        document.getElementById("username").textContent = updatedUser.name || "User";
-        document.getElementById("user-name-header").textContent = updatedUser.name || "User";
-        document.getElementById("user-avatar-header").src = updatedUser.avatar || "profile-default-avatar.png";
+    // Sinkronisasi real-time antar akun/browser/tab
+    window.addEventListener("storage", (event) => {
+      if (event.key === "transactions") {
+        updateDashboard();
       }
-    }
+    });
+
+    };
   });
 
   function logout() {
     localStorage.removeItem("loggedIn");
     window.location.href = "login.html";
   }
-  </script>
+
+function togglePasswordVisibility() {
+  const input = document.getElementById("profile-password");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+</script>
+
+<style>
+  .user-info img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  #profile-picture-preview {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #aaa;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
 </head>
 <body>
-  <!-- Body content would go here -->
+  <div class="dashboard">
+    <header>
+      
+<div class="user-info" style="display: flex; align-items: center; gap: 10px;">
+  <img id="user-avatar-header" onclick="openProfileModal()" style="cursor: pointer;" src="profile-default-avatar.png" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+  <span id="user-name-header" class="profile-name" style="font-weight: bold; color: #fff;"></span>
+</div>
+
+      <h1 style="margin-top: 20px;">Selamat Datang, <span id="username"></span> 👋</h1>
+      <div class="theme-toggle">
+        <label for="darkModeToggle" id="modeIcon">☀︎</label>
+        <input type="checkbox" id="darkModeToggle" />
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div class="card">
+        <h2>Total Tabungan</h2>
+        <p id="total-tabungan">Rp 0</p>
+      </div>
+      <div class="card">
+        <h2>Pemasukan</h2>
+        <p id="total-masuk">Rp 0</p>
+      </div>
+      <div class="card">
+        <h2>Pengeluaran</h2>
+        <p id="total-keluar">Rp 0</p>
+      </div>
+    </section>
+
+    <section class="transaction-add">
+      <h2>Tambah Transaksi</h2>
+      <form id="add-form">
+        <input type="date" id="tanggal" required />
+        <input type="text" id="keterangan" placeholder="Keterangan" required />
+        <select id="jenis" required>
+          <option value="Pemasukan">Pemasukan</option>
+          <option value="Pengeluaran">Pengeluaran</option>
+        </select>
+        <input type="text" id="jumlah" placeholder="Jumlah" required />
+        <button type="submit">
+          <span>Tambah</span>
+          <svg fill="none" viewBox="0 0 24 24" class="arrow" width="24" height="24">
+            <path
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2"
+              stroke="currentColor"
+              d="M5 12h14M13 6l6 6-6 6"
+            ></path>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <section class="transaction">
+      <h2>Riwayat Transaksi</h2>
+      <table id="transaction-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Keterangan</th>
+            <th>Jenis</th>
+            <th>Jumlah</th>
+            <th>User</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Modal Edit -->
+    <div class="modal" id="editModal">
+      <div class="modal-content" style="margin-top: -40px;">
+        <h3>Edit Transaksi</h3>
+        <form id="edit-form">
+          <label for="edit-tanggal">Tanggal</label>
+          <input type="date" id="edit-tanggal" required />
+
+          <label for="edit-keterangan">Keterangan</label>
+          <input type="text" id="edit-keterangan" required />
+
+          <label for="edit-jenis">Jenis</label>
+          <select id="edit-jenis" required>
+            <option value="Pemasukan">Pemasukan</option>
+            <option value="Pengeluaran">Pengeluaran</option>
+          </select>
+
+          <label for="edit-jumlah">Jumlah</label>
+          <input type="text" id="edit-jumlah" required />
+
+          <label>User yang input:</label>
+          <p id="edit-user" style="font-weight:600; margin-top:0;">-</p>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" id="modal-close">Batal</button>
+            <button type="submit" class="save-btn">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer>
+      <p>© Copyright 2025 Wukong. All Rights Reserved. | Tabungan App</p>
+    </footer>
+  </div>
+
+<!-- Modal Profil -->
+<div class="modal" id="profileModal">
+  <div class="modal-content" style="margin-top: -40px;">
+    <h3>Profil Pengguna</h3>
+    <form id="profile-form">
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <img id="profile-picture-preview" src="default-avatar.png" alt="Foto Profil" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
+        <br />
+        <input type="file" id="profile-picture" accept="image/*" style="margin-top: 0.5rem;" />
+      </div>
+      <label for="profile-name">Nama</label>
+      <input type="text" id="profile-name" required />
+      <label for="profile-email">Email</label>
+      <input type="email" id="profile-email" required />
+      <label for="profile-password">Password</label>
+<div style="position: relative;">
+  <input type="password" id="profile-password" required style="padding-right: 30px;" />
+  <span onclick="togglePasswordVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">👁️</span>
+</div>
+
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" onclick="closeProfileModal()">Batal</button>
+        <button type="submit" class="save-btn">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openProfileModal() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (user) {
+    document.getElementById("profile-name").value = user.name || "";
+    document.getElementById("profile-email").value = user.email || "";
+    document.getElementById("profile-password").value = user.password || "";
+    document.getElementById("profile-picture-preview").src = user.avatar || "default-avatar.png";
+  }
+  document.getElementById("profileModal").classList.add("active");
+}
+
+function closeProfileModal() {
+  document.getElementById("profileModal").classList.remove("active");
+}
+
+document.getElementById("profile-picture").addEventListener("change", function () {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      document.getElementById("profile-picture-preview").src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById("profile-form").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const name = document.getElementById("profile-name").value;
+  const email = document.getElementById("profile-email").value;
+  const password = document.getElementById("profile-password").value;
+  const avatar = document.getElementById("profile-picture-preview").src;
+
+  const updatedUser = { name, email, password, avatar };
+  localStorage.setItem("user", JSON.stringify(updatedUser));
+  alert("Profil berhasil diperbarui!");
+  document.getElementById("username").textContent = name;
+  closeProfileModal();
+});
+
+function togglePasswordVisibility() {
+  const input = document.getElementById("profile-password");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const avatarEl = document.getElementById("user-avatar-header");
+  const nameEl = document.getElementById("user-name-header");
+
+  if (avatarEl) avatarEl.src = user.avatar || "profile-default-avatar.png";
+  if (nameEl) nameEl.textContent = user.name || "User";
+});
+
+function togglePasswordVisibility() {
+  const input = document.getElementById("profile-password");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+</script>
 </body>
 </html>
