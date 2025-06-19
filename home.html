@@ -84,7 +84,7 @@
             <td class="${t.jenis === 'Pemasukan' ? 'masuk' : 'keluar'}">${t.jenis}</td>
             <td>${formatRupiah(t.jumlah)}</td>
             <td>${t.user || "-"}</td>
-            <td class="action-btn-container">
+            <td>
               <button class="action-btn edit-btn" onclick="editTransaction(${index})">Edit</button>
               <button class="action-btn delete-btn" onclick="deleteTransaction(${index})">Hapus</button>
             </td>
@@ -206,7 +206,7 @@
 <body>
   <div class="dashboard">
     <header>
-      <h1>Selamat Datang, <span id="username"></span> 👋</h1>
+      <h1>Selamat Datang, <span id="username"></span> </h1>
       <div class="theme-toggle">
         <label for="darkModeToggle" id="modeIcon">☀︎</label>
         <input type="checkbox" id="darkModeToggle" />
@@ -214,97 +214,96 @@
       </div>
     </header>
 
-    <section class="summary">
-      <div class="card">
-        <h2>Total Tabungan</h2>
-        <p id="total-tabungan">Rp 0</p>
-      </div>
-      <div class="card">
-        <h2>Pemasukan</h2>
-        <p id="total-masuk">Rp 0</p>
-      </div>
-      <div class="card">
-        <h2>Pengeluaran</h2>
-        <p id="total-keluar">Rp 0</p>
-      </div>
-    </section>
-
-    <section class="transaction-add">
-      <h2>Tambah Transaksi</h2>
-      <form id="add-form">
-        <input type="date" id="tanggal" required />
-        <input type="text" id="keterangan" placeholder="Keterangan" required />
-        <select id="jenis" required>
-          <option value="Pemasukan">Pemasukan</option>
-          <option value="Pengeluaran">Pengeluaran</option>
-        </select>
-        <input type="text" id="jumlah" placeholder="Jumlah" required />
-        <button type="submit">
-          <span>Tambah</span>
-          <svg fill="none" viewBox="0 0 24 24" class="arrow" width="24" height="24">
-            <path
-              stroke-linejoin="round"
-              stroke-linecap="round"
-              stroke-width="2"
-              stroke="currentColor"
-              d="M5 12h14M13 6l6 6-6 6"
-            ></path>
-          </svg>
-        </button>
-      </form>
-    </section>
-
-    <section class="transaction">
-      <h2>Riwayat Transaksi</h2>
-      <table id="transaction-table">
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Keterangan</th>
-            <th>Jenis</th>
-            <th>Jumlah</th>
-            <th>User</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- Modal Edit -->
-    <div class="modal" id="editModal">
-      <div class="modal-content">
-        <h3>Edit Transaksi</h3>
-        <form id="edit-form">
-          <label for="edit-tanggal">Tanggal</label>
-          <input type="date" id="edit-tanggal" required />
-
-          <label for="edit-keterangan">Keterangan</label>
-          <input type="text" id="edit-keterangan" required />
-
-          <label for="edit-jenis">Jenis</label>
-          <select id="edit-jenis" required>
-            <option value="Pemasukan">Pemasukan</option>
-            <option value="Pengeluaran">Pengeluaran</option>
-          </select>
-
-          <label for="edit-jumlah">Jumlah</label>
-          <input type="text" id="edit-jumlah" required />
-
-          <label>User yang input:</label>
-          <p id="edit-user" style="font-weight:600; margin-top:0;">-</p>
-
-          <div class="modal-actions">
-            <button type="button" class="cancel-btn" id="modal-close">Batal</button>
-            <button type="submit" class="save-btn">Simpan</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <footer>
-      <p>© 2025 My Wallet | Tabungan App</p>
-    </footer>
+<section class="summary">
+  <div class="card">
+    <h2>Total Tabungan</h2>
+    <p id="total-tabungan">Rp 0</p>
   </div>
+  <div class="card">
+    <h2>Pemasukan</h2>
+    <p id="total-masuk">Rp 0</p>
+  </div>
+  <div class="card">
+    <h2>Pengeluaran</h2>
+    <p id="total-keluar">Rp 0</p>
+  </div>
+</section>
+
+<section class="transaction-add">
+  <h2>Tambah Transaksi</h2>
+  <form id="add-form">
+    <input type="date" id="tanggal" required />
+    <input type="text" id="keterangan" placeholder="Keterangan" required />
+    <select id="jenis" required>
+      <option value="Pemasukan">Pemasukan</option>
+      <option value="Pengeluaran">Pengeluaran</option>
+    </select>
+    <input type="text" id="jumlah" placeholder="Jumlah" required />
+    <button type="submit">
+      <span>Tambah</span>
+      <svg fill="none" viewBox="0 0 24 24" class="arrow" width="24" height="24">
+        <path
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="2"
+          stroke="currentColor"
+          d="M5 12h14M13 6l6 6-6 6"
+        ></path>
+      </svg>
+    </button>
+  </form>
+</section>
+
+<section class="transaction">
+  <h2>Riwayat Transaksi</h2>
+  <table id="transaction-table">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Keterangan</th>
+        <th>Jenis</th>
+        <th>Jumlah</th>
+        <th>User</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- Modal Edit -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <h3>Edit Transaksi</h3>
+    <form id="edit-form">
+      <label for="edit-tanggal">Tanggal</label>
+      <input type="date" id="edit-tanggal" required />
+
+      <label for="edit-keterangan">Keterangan</label>
+      <input type="text" id="edit-keterangan" required />
+
+      <label for="edit-jenis">Jenis</label>
+      <select id="edit-jenis" required>
+        <option value="Pemasukan">Pemasukan</option>
+        <option value="Pengeluaran">Pengeluaran</option>
+      </select>
+
+      <label for="edit-jumlah">Jumlah</label>
+      <input type="text" id="edit-jumlah" required />
+
+      <label>User yang input:</label>
+      <p id="edit-user" style="font-weight:600; margin-top:0;">-</p>
+
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" id="modal-close">Batal</button>
+        <button type="submit" class="save-btn">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 My Wallet | Tabungan App</p>
+</footer>  </div>
 </body>
 </html>
