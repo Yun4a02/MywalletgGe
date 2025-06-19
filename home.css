@@ -1,0 +1,665 @@
+/* Reset dasar */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #f0f2f5;
+  color: #333;
+}
+
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+body.dark-mode .card,
+body.dark-mode .transaction-add,
+body.dark-mode table,
+body.dark-mode .modal-content {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+  border-color: #444;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-toggle label {
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.theme-toggle input[type="checkbox"] {
+  width: 40px;
+  height: 20px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #ccc;
+  outline: none;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 1px;
+  left: 1px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.theme-toggle input[type="checkbox"]:checked {
+  background-color: #2196f3;
+}
+
+.theme-toggle input[type="checkbox"]:checked::before {
+  transform: translateX(20px);
+}
+
+/* Tabel */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  font-size: 0.9rem;
+  background: transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+thead tr {
+  background-color: #0275d8;
+  color: white;
+  border-radius: 10px;
+}
+
+thead th {
+  padding: 12px 15px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tbody tr {
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease;
+}
+
+tbody tr:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+tbody td {
+  padding: 12px 15px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.left-align {
+  text-align: left !important;
+}
+
+.masuk {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.keluar {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.action-btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.action-btn {
+  padding: 5px 10px;
+  margin: 0 3px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #b02a37;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-bottom: 1rem;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  text-align: right;
+}
+
+.modal-actions button {
+  padding: 8px 14px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-actions .cancel-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.modal-actions .cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+.modal-actions .save-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.modal-actions .save-btn:hover {
+  background-color: #218838;
+}
+
+.dashboard {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+.logout-btn {
+  padding: 0.5rem 1rem;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #c9302c;
+}
+
+/* Ringkasan */
+.summary {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.card h2 {
+  font-size: 1rem;
+  color: #888;
+}
+
+.card p {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* === Tambah Transaksi === */
+.transaction-add {
+  background-color: #ffffff;
+  padding: 1.5rem 2rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.transaction-add h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.transaction-add form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.transaction-add input[type="date"],
+.transaction-add input[type="text"],
+.transaction-add input[type="number"],
+.transaction-add select {
+  flex: 1 1 180px;
+  padding: 0.6rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.transaction-add input:focus,
+.transaction-add select:focus {
+  border-color: #0275d8;
+  box-shadow: 0 0 6px rgba(2, 117, 216, 0.3);
+  outline: none;
+}
+
+.transaction-add button[type="submit"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  background: linear-gradient(135deg, #0275d8, #0056b3);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 117, 216, 0.2);
+}
+
+.transaction-add button[type="submit"]::after {
+  content: "→";
+  font-size: 1.3rem;
+  transition: transform 0.2s ease;
+}
+
+.transaction-add button[type="submit"]:hover {
+  background: linear-gradient(135deg, #025aa5, #003e80);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 86, 179, 0.3);
+}
+
+.transaction-add button[type="submit"]:hover::after {
+  transform: translateX(4px);
+}
+
+/* Tambahan DARK MODE tabel dan form */
+body.dark-mode table {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
+}
+
+body.dark-mode thead tr {
+  background-color: #333;
+  color: #ffffff;
+}
+
+body.dark-mode tbody tr {
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+}
+
+body.dark-mode tbody tr:hover {
+  background-color: #3a3a3a;
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .transaction-add input,
+body.dark-mode .transaction-add select {
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+
+body.dark-mode .transaction-add input:focus,
+body.dark-mode .transaction-add select:focus {
+  border-color: #66b2ff;
+  box-shadow: 0 0 6px rgba(102, 178, 255, 0.3);
+}
+
+body.dark-mode .modal-content {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+}
+
+body.dark-mode .modal-content input,
+body.dark-mode .modal-content select {
+  background-color: #1f1f1f;
+  color: #eaeaea;
+  border: 1px solid #555;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .summary {
+    flex-direction: column;
+  }
+
+  .transaction-add form {
+    flex-direction: column;
+  }
+
+  .transaction-add input,
+  .transaction-add select,
+  .transaction-add button {
+    width: 100%;
+  }
+}
+
+
+/* Tambahan agar judul 'Tambah Transaksi' terlihat jelas di dark mode */
+body.dark-mode .transaction-add h2 {
+  color: #ffffff;
+}
+
+
+/* Perbaikan tambahan agar semua teks di form dan tabel terlihat jelas di dark mode */
+body.dark-mode .transaction-add label,
+body.dark-mode .transaction-add input,
+body.dark-mode .transaction-add select,
+body.dark-mode .transaction-add option,
+body.dark-mode .transaction h2,
+body.dark-mode th,
+body.dark-mode td,
+body.dark-mode .card h2,
+body.dark-mode .card p,
+body.dark-mode header h1,
+body.dark-mode .modal-content h3,
+body.dark-mode .modal-content label,
+body.dark-mode .modal-content p {
+  color: #ffffff !important;
+}
+
+body.dark-mode .transaction-add input::placeholder {
+  color: #cccccc;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode option {
+  color-scheme: dark;
+}
+
+
+/* Tambahan final agar semua teks terlihat di dark mode */
+body.dark-mode .transaction-add label,
+body.dark-mode .transaction-add input,
+body.dark-mode .transaction-add select,
+body.dark-mode .transaction h2,
+body.dark-mode .transaction-add option,
+body.dark-mode .modal-content h3,
+body.dark-mode .modal-content label,
+body.dark-mode .modal-content p,
+body.dark-mode th,
+body.dark-mode td {
+  color: #ffffff !important;
+}
+
+body.dark-mode .transaction-add input::placeholder {
+  color: #bbbbbb;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode option {
+  color-scheme: dark;
+}
+
+/* === Modernized Enhancements === */
+
+/* Modern Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
+}
+
+header h1 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 25px;
+  transition: background 0.3s ease;
+}
+
+.user-info:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.user-info img {
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.user-info img:hover {
+  transform: scale(1.05);
+}
+
+/* Dark mode enhancements */
+body.dark-mode .user-info:hover {
+  background-color: rgba(255,255,255,0.05);
+}
+
+body.dark-mode header {
+  border-bottom: 1px solid #333;
+}
+
+
+/* === Cropper Profile Styles === */
+
+/* Avatar preview styling */
+#profile-picture-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #000000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: inline-block;
+}
+
+/* Cropper modal overrides */
+#cropperModal .modal-content {
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+#cropperModal img#cropper-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
+  background-color: #f4f4f4;
+}
+
+/* Dark mode support */
+body.dark-mode #cropperModal .modal-content {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-mode #cropperModal img {
+  background: #2c2c2c;
+}
+
+
+/* === Updated Modal Cropper Layout === */
+
+#cropperModal .modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#cropperModal .modal-actions button {
+  min-width: 100px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Dark mode improvements */
+body.dark-mode #cropperModal .modal-content {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+body.dark-mode #cropperModal img#cropper-image {
+  background-color: #2b2b2b;
+  border-color: #555;
+}
+
+/* Final Profile Avatar Styles */
+.user-info img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #4a006d;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+#profile-picture-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #aaa;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+/* === Profile Name Visibility Fix - Final === */
+.profile-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-left: 6px;
+  display: inline-block;
+  color: #2c3e50 !important; /* Force dark color in light mode */
+}
+
+body.dark-mode .profile-name {
+  color: #ffffff !important; /* White in dark mode */
+}

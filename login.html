@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin My Wallet</title>
+  <link rel="stylesheet" href="styleslogin.css" />
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Cek apakah user sudah login
+      const loggedIn = localStorage.getItem("loggedIn");
+      if (loggedIn === "true") {
+        window.location.href = "home.html";
+      }
+    });
+
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      const toggleIcon = document.getElementById("toggle-password");
+      const type = passwordInput.type === "password" ? "text" : "password";
+      passwordInput.type = type;
+      toggleIcon.textContent = type === "password" ? "👁️" : "🙈";
+    }
+
+    function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        alert("Mohon isi semua kolom.");
+        return;
+      }
+
+      // Ambil data user dari localStorage
+      const storedUserJSON = localStorage.getItem("user");
+      if (!storedUserJSON) {
+        alert("Akun belum terdaftar. Silakan daftar terlebih dahulu.");
+        return;
+      }
+
+      let storedUser;
+      try {
+        storedUser = JSON.parse(storedUserJSON);
+      } catch (e) {
+        alert("Data akun rusak. Silakan daftar ulang.");
+        localStorage.removeItem("user");
+        return;
+      }
+
+      // Cek kecocokan email dan password
+      if (storedUser.email === email && storedUser.password === password) {
+        localStorage.setItem("loggedIn", "true");
+        alert("Login berhasil!");
+        window.location.href = "home.html";
+      } else {
+        alert("Email atau password salah!");
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="background">
+    <div class="login-container">
+      <h1>Login</h1>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" />
+      </div>
+      <div class="form-group password-group">
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Enter your password" />
+          <span id="toggle-password" class="toggle-icon" onclick="togglePassword()">👁️</span>
+        </div>
+      </div>
+      <button type="button" class="login-btn" onclick="login()">Login</button>
+      <div class="register-link">
+        <a href="daftar.html">Belum punya akun? Daftar di sini</a>
+      </div>
+      <div class="footer">
+        <p>© Copyright 2025 Wukong. All Rights Reserved.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

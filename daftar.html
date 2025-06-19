@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register Account My Wallet</title>
+  <link rel="stylesheet" href="daftar.css"/>
+  <script>
+    function toggleVisibility(id, iconId) {
+      const input = document.getElementById(id);
+      const icon = document.getElementById(iconId);
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      icon.textContent = isPassword ? "🙈" : "👁️";
+    }
+
+    function validatePasswordMatch() {
+      const password = document.getElementById("password");
+      const rePassword = document.getElementById("re-password");
+      const message = document.getElementById("password-error");
+
+      if (password.value && rePassword.value && password.value !== rePassword.value) {
+        message.style.display = "block";
+        return false;
+      } else {
+        message.style.display = "none";
+        return true;
+      }
+    }
+
+    function registerUser() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const rePassword = document.getElementById("re-password").value.trim();
+
+      if (!name || !email || !password || !rePassword) {
+        alert("Semua field harus diisi.");
+        return;
+      }
+
+      if (!validatePasswordMatch()) {
+        return;
+      }
+
+      // Simpan data user ke localStorage
+      const user = { name, email, password };
+      localStorage.setItem("user", JSON.stringify(user));
+
+      alert("Akun berhasil dibuat! Silakan login.");
+      window.location.href = "login.html";
+    }
+  </script>
+</head>
+<body>
+  <div class="background">
+    <div class="login-container">
+      <h1>Register Account</h1>
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Enter your Name" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Enter your password" oninput="validatePasswordMatch()" />
+          <span class="toggle-icon" id="toggle-pass1" onclick="toggleVisibility('password', 'toggle-pass1')">👁️</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="re-password">Re-Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="re-password" placeholder="Enter your password again" oninput="validatePasswordMatch()" />
+          <span class="toggle-icon" id="toggle-pass2" onclick="toggleVisibility('re-password', 'toggle-pass2')">👁️</span>
+        </div>
+      </div>
+      <p id="password-error" class="error-text" style="display:none; color:red;">Password tidak sama!</p>
+      <div class="button-group">
+        <button type="button" class="login-btn" onclick="registerUser()">Register</button>
+        <button type="button" class="cancel-btn" onclick="window.location.href='login.html'">Cancel</button>
+      </div>
+      <div class="footer">
+        <p>© Copyright 2025 Wukong. All Rights Reserved.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
